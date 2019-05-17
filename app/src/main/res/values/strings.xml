@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">RestAPIExample</string>
+    <string name="pub_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs+JiaeX9DosDDuDMwXgO
+cwef04Fn6m9PqpQSFxDVi9SMMT9GF/whaJtA6URrKExvcgfi6XAdPOE3iksGpd4w
+XdYploiU/iX6jXv4oW4XvCfL5mxJzFVExgoz136GGXNBmY1/QZjKq9fSJcYTkc39
+v/cDq8gwFKtu25actgjRXKAB6OzPD+Rs5axCkUo8AQz/DFHqyyn8aSM7BMJliw8b
+gU65pyyyfUljeL6RY915RcFhE2DwmpLVhc0BpHL76SQVkVdTc5G95lgEbodYZ1Fa
+PzxVMIFkH2H8zb3HzoGpFxXXWwmJ/fullLqjJrHilsAsx1aB01pC+uuZJEgMFtem
+nQIDAQAB</string>
+    <string name="login_failed">The username or password is incorrect</string>
+    <string name="login_error">Error! Please try again!</string>
+</resources>
