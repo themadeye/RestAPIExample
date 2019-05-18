@@ -8,10 +8,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.restapiexample.R;
 import com.example.restapiexample.fragments.FemalePager;
 import com.example.restapiexample.fragments.MalePager;
 import com.example.restapiexample.fragments.AllPager;
+import com.example.restapiexample.model.Users;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements
         MalePager.OnFragmentInteractionListener,
@@ -22,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button profile;
     private Button message;
     private Button exit;
+    private RequestQueue mQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +77,34 @@ public class MainActivity extends AppCompatActivity implements
         profile = (Button)findViewById(R.id.profile);
         message = (Button)findViewById(R.id.message);
         exit = (Button)findViewById(R.id.exit);
+
+        mQueue = Volley.newRequestQueue(this);
+        String URL = "https://reqres.in/api/users?page=2";
+        JsonObjectRequest job = new JsonObjectRequest(Request.Method.GET, URL, null,
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            JSONArray jary = response.getJSONArray("data");
+                            for(int i = 0; i < jary.length(); i++){
+                                JSONObject data = jary.getJSONObject(i);
+                                Users users = new Users();
+                                users.setID(Integer.valueOf(data.getString("id")));
+                                users.setEmail(data.getString("email"));
+                                users.setFirstName(data.getString("first_name"));
+                                users.setLastName(data.getString("last_name"));
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mQueue.add(job);
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override

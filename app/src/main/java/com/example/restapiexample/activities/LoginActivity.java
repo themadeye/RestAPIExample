@@ -13,17 +13,24 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.restapiexample.R;
 import com.example.restapiexample.model.ResObj;
+import com.example.restapiexample.model.Users;
 import com.example.restapiexample.services.RSA;
 import com.example.restapiexample.services.RestAuthenticationClient;
 import com.example.restapiexample.services.UserService;
+import com.example.restapiexample.sqlite.UserDBHelper;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,7 +44,12 @@ public class LoginActivity extends AppCompatActivity {
     byte[] encodePass = null;
     private String encryptedPass;
     UserService userService;
-    private String baseUrl = "http://203.116.15.18/MobileSvc/api/Test/Login/";
+    UserDBHelper dbHelp = new UserDBHelper(LoginActivity.this);
+
+    //URL stuff
+    private String baseUrl = "http://203.116.15.18/MobileSvc/api/Test/Login";
+//    String URL = "https://jsonplaceholder.typicode.com/todos/1";
+    String URL = "https://postman-echo.com/basic-auth";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +61,13 @@ public class LoginActivity extends AppCompatActivity {
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
         btnLogin = (Button)findViewById(R.id.btnLogin);
-
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                startActivity(intent);
+
                 byte[] userPass = password.getText().toString().getBytes();
                 try{
 //                    encodePass = RSA.encryptByPublicKey(userPass, getString(R.string.pub_key));
@@ -62,7 +77,8 @@ public class LoginActivity extends AppCompatActivity {
                     //Use the authentication to call REST api url
                     try{
                         RestAuthenticationClient rac =
-                                new RestAuthenticationClient(baseUrl, username.getText().toString(), encryptedPass);
+                                new RestAuthenticationClient(URL, username.getText().toString(),
+                                        password.getText().toString());
 
                         AsyncTask<Void, Void, String> execute = new ExecuteNetworkOperation(rac);
                         execute.execute();
@@ -70,31 +86,11 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
+
                     //Use Retrofit to call REST API url
 //                    validateLogin(username.getText().toString(), password.getText().toString());
 
 
-//                    //Use Volley to call REST API and return JSON
-//                    String URL = "http://203.116.15.18/MobileSvc/api/Test/Login/"+ "UserName=" +username.getText().toString() +"&"+ "Password=" + encryptedPass;
-//
-//                    RequestQueue rq = Volley.newRequestQueue(LoginActivity.this);
-//
-//                    JsonObjectRequest ojr = new JsonObjectRequest(Request.Method.GET, URL, null,
-//                            new com.android.volley.Response.Listener<JSONObject>() {
-//                                @Override
-//                                public void onResponse(JSONObject response) {
-//                                    Log.e("Rest Response", response.toString());// the response is JSON format
-//                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                                    startActivity(intent);
-//                                }
-//                            }, new com.android.volley.Response.ErrorListener() {
-//                        @Override
-//                        public void onErrorResponse(VolleyError error) {
-//                            Log.e("Rest Response", error.toString());
-//                            Toast.makeText(LoginActivity.this, getString(R.string.login_error), Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                    rq.add(ojr);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -102,6 +98,43 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void getProfileList(){
+        String URL = "https://reqres.in/api/users?page=2";
+
+        RequestQueue rq = Volley.newRequestQueue(LoginActivity.this);
+
+        JsonObjectRequest ojr = new JsonObjectRequest(Request.Method.GET, URL, null,
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("Rest Response", response.toString());// the response is JSON format
+                        try{
+                            JSONArray jary = response.getJSONArray("data");
+                            for(int i = 0; i < jary.length(); i++){
+                                JSONObject data = jary.getJSONObject(i);
+                                Users users = new Users();
+                                users.setID(Integer.valueOf(data.getString("id")));
+                                users.setEmail(data.getString("email"));
+                                users.setFirstName(data.getString("first_name"));
+                                users.setLastName(data.getString("last_name"));
+                                dbHelp.updateUsers(users);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+//                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                                    startActivity(intent);
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Rest Response", error.toString());
+                Toast.makeText(LoginActivity.this, getString(R.string.login_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+        rq.add(ojr);
     }
 
     public class ExecuteNetworkOperation extends AsyncTask<Void, Void, String> {
@@ -135,7 +168,10 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             // Login Success
-            if (isValidCredentials.equals("true")) {
+            if (isValidCredentials.contains("true")) {
+                getProfileList();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
             }
             // Login Failure
             else {
