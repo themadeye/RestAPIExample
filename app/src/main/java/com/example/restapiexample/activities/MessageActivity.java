@@ -45,10 +45,10 @@ public class MessageActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //Do something after 100ms
+                //Do something after 30Sec
                 sendNotification();
             }
-        }, 3000);
+        }, 30000);
     }
 
     private void findViews(){

@@ -79,16 +79,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                startActivity(intent);
-
+                //Here to encrypt the password, call URL to execute rest authentication
                 byte[] userPass = password.getText().toString().getBytes();
                 try{
 //                    encodePass = RSA.encryptByPublicKey(userPass, getString(R.string.pub_key));
                     encryptedPass = RSA.encryptByPublic(password.getText().toString(), getString(R.string.pub_key));
 //                    encryptedPass = new BigInteger(1, encodePass).toString(16);
 
-                    //Use the authentication to call REST api url
+                    //Use the authentication to call REST api url, not passing encrypted password, because the Postman URL did not implement decryption
                     try{
                         RestAuthenticationClient rac =
                                 new RestAuthenticationClient(URL, username.getText().toString(),
@@ -126,6 +124,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getProfileList(){
+        //Here to use REQ sample URL to get users list as JSON array, should worked as well as Etiqa's url.
         String URL = "https://reqres.in/api/users?page=2";
 
         RequestQueue rq = Volley.newRequestQueue(LoginActivity.this);
@@ -168,8 +167,6 @@ public class LoginActivity extends AppCompatActivity {
         private RestAuthenticationClient rac;
         private String isValidCredentials;
 
-         // Overload the constructor to pass objects to this class.
-
         public ExecuteNetworkOperation(RestAuthenticationClient rac) {
             this.rac = rac;
         }
@@ -194,7 +191,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             // Login Success
-            if (isValidCredentials.contains("true")) {
+            if (isValidCredentials.contains("true")) {//should be using equals instead of contains, but leave it for now, it is just custom testing url.
                 updateLogin();
                 getProfileList();
             }
