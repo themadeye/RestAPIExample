@@ -8,6 +8,16 @@ public class Users {
     private String lastName;
     private String age;
 
+    public Users(int ID, String email, String firstName, String lastName) {
+        this.ID = ID;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public Users() {
+    }
+
     public int getID() {
         return ID;
     }

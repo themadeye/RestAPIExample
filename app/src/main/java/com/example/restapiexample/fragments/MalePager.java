@@ -7,8 +7,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.restapiexample.R;
+import com.example.restapiexample.activities.CustomAdapter;
+import com.example.restapiexample.model.Users;
+import com.example.restapiexample.sqlite.UserDBHelper;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,10 +26,10 @@ import com.example.restapiexample.R;
  * create an instance of this fragment.
  */
 public class MalePager extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private View rootView;
+    private ListView lv;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -31,18 +38,8 @@ public class MalePager extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public MalePager() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MalePager.
-     */
-    // TODO: Rename and change types and number of parameters
     public static MalePager newInstance(String param1, String param2) {
         MalePager fragment = new MalePager();
         Bundle args = new Bundle();
@@ -64,8 +61,19 @@ public class MalePager extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_pager, container, false);
+
+        rootView =  inflater.inflate(R.layout.fragment_profile_pager, container, false);
+        findViews();
+        return rootView;
+    }
+
+    private void findViews(){
+        lv = (ListView) rootView.findViewById(R.id.list);
+        UserDBHelper dbHelper = new UserDBHelper(rootView.getContext());
+        ArrayList<Users> users = new ArrayList<>();
+        users = dbHelper.getUsers();
+        CustomAdapter customAdapter = new CustomAdapter(rootView.getContext(), users);
+        lv.setAdapter(customAdapter);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -91,19 +99,7 @@ public class MalePager extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

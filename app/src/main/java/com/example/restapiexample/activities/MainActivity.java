@@ -1,5 +1,6 @@
 package com.example.restapiexample.activities;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -18,6 +19,7 @@ import com.example.restapiexample.fragments.FemalePager;
 import com.example.restapiexample.fragments.MalePager;
 import com.example.restapiexample.fragments.AllPager;
 import com.example.restapiexample.model.Users;
+import com.example.restapiexample.sqlite.UserDBHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -78,33 +80,33 @@ public class MainActivity extends AppCompatActivity implements
         message = (Button)findViewById(R.id.message);
         exit = (Button)findViewById(R.id.exit);
 
-        mQueue = Volley.newRequestQueue(this);
-        String URL = "https://reqres.in/api/users?page=2";
-        JsonObjectRequest job = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new com.android.volley.Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try{
-                            JSONArray jary = response.getJSONArray("data");
-                            for(int i = 0; i < jary.length(); i++){
-                                JSONObject data = jary.getJSONObject(i);
-                                Users users = new Users();
-                                users.setID(Integer.valueOf(data.getString("id")));
-                                users.setEmail(data.getString("email"));
-                                users.setFirstName(data.getString("first_name"));
-                                users.setLastName(data.getString("last_name"));
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        mQueue.add(job);
+//        mQueue = Volley.newRequestQueue(this);
+//        String URL = "https://reqres.in/api/users?page=2";
+//        JsonObjectRequest job = new JsonObjectRequest(Request.Method.GET, URL, null,
+//                new com.android.volley.Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try{
+//                            JSONArray jary = response.getJSONArray("data");
+//                            for(int i = 0; i < jary.length(); i++){
+//                                JSONObject data = jary.getJSONObject(i);
+//                                Users users = new Users();
+//                                users.setID(Integer.valueOf(data.getString("id")));
+//                                users.setEmail(data.getString("email"));
+//                                users.setFirstName(data.getString("first_name"));
+//                                users.setLastName(data.getString("last_name"));
+//                            }
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new com.android.volley.Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//            }
+//        });
+//        mQueue.add(job);
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,14 +118,20 @@ public class MainActivity extends AppCompatActivity implements
         message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(MainActivity.this, MessageActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.exit(0);
+                UserDBHelper dbHelp = new UserDBHelper(MainActivity.this);
+                dbHelp.updateCredential("false");
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

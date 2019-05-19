@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private Button btnLogin;
+    private Button btnExit;
     byte[] encodePass = null;
     private String encryptedPass;
     UserService userService;
@@ -54,13 +55,26 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        findViews();
+//        findViews();
+        checkLogin();
+    }
+
+    private void checkLogin(){
+        if(dbHelp.checkCredential().equals("true")){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }else{
+
+            findViews();
+        }
     }
 
     private void findViews(){
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
         btnLogin = (Button)findViewById(R.id.btnLogin);
+        btnExit = (Button)findViewById(R.id.btnExit);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,6 +112,17 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.exit(0);
+            }
+        });
+    }
+
+    private void updateLogin(){
+        dbHelp.updateCredential("true");
     }
 
     private void getProfileList(){
@@ -119,13 +144,14 @@ public class LoginActivity extends AppCompatActivity {
                                 users.setEmail(data.getString("email"));
                                 users.setFirstName(data.getString("first_name"));
                                 users.setLastName(data.getString("last_name"));
-                                dbHelp.updateUsers(users);
+                                dbHelp.insertUsers(users);
                             }
                         }catch (Exception e){
                             e.printStackTrace();
                         }
-//                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                                    startActivity(intent);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }, new com.android.volley.Response.ErrorListener() {
             @Override
@@ -169,9 +195,8 @@ public class LoginActivity extends AppCompatActivity {
             super.onPostExecute(result);
             // Login Success
             if (isValidCredentials.contains("true")) {
+                updateLogin();
                 getProfileList();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
             }
             // Login Failure
             else {
