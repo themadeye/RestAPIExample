@@ -9,6 +9,7 @@ PzxVMIFkH2H8zb3HzoGpFxXXWwmJ/fullLqjJrHilsAsx1aB01pC+uuZJEgMFtem
 nQIDAQAB</string>
     <string name="login_failed">The username or password is incorrect</string>
     <string name="login_error">Error! Please try again!</string>
+    <string name="login_success">Login Success! Redirecting you to main page</string>
     <string name="profile">Profile</string>
     <string name="msg">Message</string>
     <string name="exit">Exit</string>

@@ -2,18 +2,22 @@ package com.example.restapiexample.activities;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.restapiexample.R;
@@ -23,21 +27,18 @@ import com.example.restapiexample.services.RSA;
 import com.example.restapiexample.services.RestAuthenticationClient;
 import com.example.restapiexample.services.UserService;
 import com.example.restapiexample.sqlite.UserDBHelper;
-import com.google.gson.Gson;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
-
+    LinearLayout linearLayout;
     private EditText username;
     private EditText password;
     private Button btnLogin;
@@ -46,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
     private String encryptedPass;
     UserService userService;
     UserDBHelper dbHelp = new UserDBHelper(LoginActivity.this);
-
     //URL stuff
     private String baseUrl = "http://203.116.15.18/MobileSvc/api/Test/Login";
 //    String URL = "https://jsonplaceholder.typicode.com/todos/1";
@@ -57,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 //        findViews();
         checkLogin();
+
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
     }
 
     private void checkLogin(){
@@ -65,7 +67,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }else{
-
             findViews();
         }
     }
@@ -192,6 +193,34 @@ public class LoginActivity extends AppCompatActivity {
             super.onPostExecute(result);
             // Login Success
             if (isValidCredentials.contains("true")) {//should be using equals instead of contains, but leave it for now, it is just custom testing url.
+
+                //This is custom toast view
+//                LayoutInflater inflater = getLayoutInflater();
+//                View layout = inflater.inflate(R.layout.custom_toast_view,
+//                        (ViewGroup) findViewById(R.id.custom_toast_container));
+//
+//                TextView text = (TextView) layout.findViewById(R.id.text);
+//                text.setText(R.string.login_success);
+//
+//                Toast toast = new Toast(getApplicationContext());
+//                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+//                toast.setDuration(Toast.LENGTH_LONG);
+//                toast.setView(layout);
+//                toast.show();
+
+                Snackbar snackbar = Snackbar
+                        .make(linearLayout, R.string.login_success, Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Snackbar snackbar1 = Snackbar.make(linearLayout, "Message is restored!", Snackbar.LENGTH_SHORT);
+                                snackbar1.show();
+                            }
+                        });
+
+                snackbar.show();
+
+//                Toast.makeText(getApplicationContext(), getString(R.string.login_success), Toast.LENGTH_LONG).show();
                 updateLogin();
                 getProfileList();
             }
