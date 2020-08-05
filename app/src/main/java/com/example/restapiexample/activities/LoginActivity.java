@@ -1,8 +1,13 @@
 package com.example.restapiexample.activities;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,9 +38,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.restapiexample.App.CHANNEL_ID;
 
 public class LoginActivity extends AppCompatActivity {
     LinearLayout linearLayout;
@@ -47,22 +56,59 @@ public class LoginActivity extends AppCompatActivity {
     private String encryptedPass;
     UserService userService;
     UserDBHelper dbHelp = new UserDBHelper(LoginActivity.this);
-    //URL stuff
     private String baseUrl = "http://203.116.15.18/MobileSvc/api/Test/Login";
 //    String URL = "https://jsonplaceholder.typicode.com/todos/1";
     String URL = "https://postman-echo.com/basic-auth";
+    private NotificationManagerCompat notificationManager;
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        notificationManager = NotificationManagerCompat.from(this);
 //        findViews();
         checkLogin();
-
+        Log.d(LOG_TAG, "-------");
+        Log.d(LOG_TAG, "onCreate");
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+        if(savedInstanceState != null){
+            username.setText(savedInstanceState.getString("reply_text"));
+            username.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.d(LOG_TAG, "onStart");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(username.getVisibility() == View.VISIBLE){
+            outState.putString("reply_text",username.getText().toString());
+        }
+    }
+
+    private void sendNotification(){
+        String title = "Some title";
+        String message = "Some message";
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_android)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_EVENT)
+                .build();
+        notificationManager.notify(1, notification);
     }
 
     private void checkLogin(){
         if(dbHelp.checkCredential().equals("true")){
+            sendNotification();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -76,39 +122,56 @@ public class LoginActivity extends AppCompatActivity {
         password = (EditText)findViewById(R.id.password);
         btnLogin = (Button)findViewById(R.id.btnLogin);
         btnExit = (Button)findViewById(R.id.btnExit);
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+
+//        btnLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                //Here to encrypt the password, call URL to execute rest authentication
+//                byte[] userPass = password.getText().toString().getBytes();
+//                try{
+////                    encodePass = RSA.encryptByPublicKey(userPass, getString(R.string.pub_key));
+//                    encryptedPass = RSA.encryptByPublic(password.getText().toString(), getString(R.string.pub_key));
+////                    encryptedPass = new BigInteger(1, encodePass).toString(16);
+//
+//                    //Use the authentication to call REST api url, not passing encrypted password, because the Postman URL did not implement decryption
+//                    try{
+//                        RestAuthenticationClient rac =
+//                            new RestAuthenticationClient(URL, username.getText().toString(),
+//                                password.getText().toString());
+//
+//                        AsyncTask<Void, Void, String> execute = new ExecuteNetworkOperation(rac);
+//                        execute.execute();
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//
+//                    //Use Retrofit to call REST API url
+////                    validateLogin(username.getText().toString(), password.getText().toString());
+//
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        });
+
+        btnLogin.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-
-                //Here to encrypt the password, call URL to execute rest authentication
-                byte[] userPass = password.getText().toString().getBytes();
+            public boolean onLongClick(View v) {
                 try{
-//                    encodePass = RSA.encryptByPublicKey(userPass, getString(R.string.pub_key));
-                    encryptedPass = RSA.encryptByPublic(password.getText().toString(), getString(R.string.pub_key));
-//                    encryptedPass = new BigInteger(1, encodePass).toString(16);
-
-                    //Use the authentication to call REST api url, not passing encrypted password, because the Postman URL did not implement decryption
+                    encryptedPass = RSA.encryptByPublic("password", getString(R.string.pub_key));
                     try{
-                        RestAuthenticationClient rac =
-                                new RestAuthenticationClient(URL, username.getText().toString(),
-                                        password.getText().toString());
-
+                        RestAuthenticationClient rac = new RestAuthenticationClient(URL, "postman", "password");
                         AsyncTask<Void, Void, String> execute = new ExecuteNetworkOperation(rac);
                         execute.execute();
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-
-
-                    //Use Retrofit to call REST API url
-//                    validateLogin(username.getText().toString(), password.getText().toString());
-
-
-
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-
+                return true;
             }
         });
 
@@ -131,33 +194,33 @@ public class LoginActivity extends AppCompatActivity {
         RequestQueue rq = Volley.newRequestQueue(LoginActivity.this);
 
         JsonObjectRequest ojr = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new com.android.volley.Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.e("Rest Response", response.toString());// the response is JSON format
-                        try{
-                            JSONArray jary = response.getJSONArray("data");
-                            for(int i = 0; i < jary.length(); i++){
-                                JSONObject data = jary.getJSONObject(i);
-                                Users users = new Users();
-                                users.setID(Integer.valueOf(data.getString("id")));
-                                users.setEmail(data.getString("email"));
-                                users.setFirstName(data.getString("first_name"));
-                                users.setLastName(data.getString("last_name"));
-                                dbHelp.insertUsers(users);
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
+            new com.android.volley.Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.e("Rest Response", response.toString());// the response is JSON format
+                    try{
+                        JSONArray jary = response.getJSONArray("data");
+                        for(int i = 0; i < jary.length(); i++){
+                            JSONObject data = jary.getJSONObject(i);
+                            Users users = new Users();
+                            users.setID(Integer.valueOf(data.getString("id")));
+                            users.setEmail(data.getString("email"));
+                            users.setFirstName(data.getString("first_name"));
+                            users.setLastName(data.getString("last_name"));
+                            dbHelp.insertUsers(users);
                         }
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Rest Response", error.toString());
-                Toast.makeText(LoginActivity.this, getString(R.string.login_error), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("Rest Response", error.toString());
+            Toast.makeText(LoginActivity.this, getString(R.string.login_error), Toast.LENGTH_SHORT).show();
             }
         });
         rq.add(ojr);
@@ -193,7 +256,7 @@ public class LoginActivity extends AppCompatActivity {
             super.onPostExecute(result);
             // Login Success
             if (isValidCredentials.contains("true")) {//should be using equals instead of contains, but leave it for now, it is just custom testing url.
-
+                sendNotification();
                 //This is custom toast view
 //                LayoutInflater inflater = getLayoutInflater();
 //                View layout = inflater.inflate(R.layout.custom_toast_view,

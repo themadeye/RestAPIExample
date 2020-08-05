@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.restapiexample.R;
 import com.example.restapiexample.sqlite.UserDBHelper;
@@ -25,12 +26,14 @@ public class MessageActivity extends AppCompatActivity {
     private Button profile;
     private Button message;
     private Button exit;
+    private TextView textView;
 
     private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
     private static final String ACTION_UPDATE_NOTIFICATION = "com.example.myapplication.ACTION_UPDATE_NOTIFICATION";
     private NotificationManager mNotifyManager;
     private static final int NOTIFICATION_ID = 0;
     private NotificationReceiver mReceiver = new NotificationReceiver();
+    public static final String EXTRA_REPLY = "com.example.restapiexample.extra.REPLY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +53,21 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void findViews(){
+        Intent intent = getIntent();
         profile = (Button)findViewById(R.id.profile);
         message = (Button)findViewById(R.id.message);
         exit = (Button)findViewById(R.id.exit);
+        textView = findViewById(R.id.text_message);
+
+        textView.setText(intent.getStringExtra(MainActivity.EXTRA_MESSAGE));
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MessageActivity.this, MainActivity.class);
-                startActivity(intent);
+                intent.putExtra(EXTRA_REPLY, "Message Received");
+                setResult(RESULT_OK, intent);
+//                startActivity(intent);
                 finish();
             }
         });

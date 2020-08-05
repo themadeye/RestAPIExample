@@ -15,7 +15,15 @@
         android:background="#0e4749"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-    
+    <TextView
+        android:id="@+id/text_reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_header" />
+
     <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -46,7 +54,7 @@
                 android:layout_margin="5dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape"
-                android:text="@string/profile"
+                android:text="@string/location"
                 android:textColor="#ffffff"/>
 
             <Button

@@ -3,11 +3,15 @@ package com.example.restapiexample.activities;
 import android.content.Intent;
 import android.net.Uri;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.example.restapiexample.R;
@@ -25,10 +29,15 @@ public class MainActivity extends AppCompatActivity implements
     private Button profile;
     private Button message;
     private Button exit;
+    private TextView text_reply;
     private RequestQueue mQueue;
+    public static final String EXTRA_MESSAGE = "com.example.restapiexample.extra.MESSAGE";
+    public static final int TEXT_REQUEST = 1;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "End SecondActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViews();
@@ -67,10 +76,40 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TEXT_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                String reply = data.getStringExtra(MessageActivity.EXTRA_REPLY);
+                text_reply.setText(reply);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(LOG_TAG, "onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }
+
     private void findViews(){
         profile = (Button)findViewById(R.id.profile);
         message = (Button)findViewById(R.id.message);
         exit = (Button)findViewById(R.id.exit);
+        text_reply = (TextView)findViewById(R.id.text_reply);
 
 //        mQueue = Volley.newRequestQueue(this);
 //        String URL = "https://reqres.in/api/users?page=2";
@@ -111,8 +150,18 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MessageActivity.class);
+                String message = "This is a simple message";
+                intent.putExtra(EXTRA_MESSAGE, message);
+                startActivityForResult(intent, TEXT_REQUEST);
+//                finish();
+            }
+        });
+
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LocationActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
 

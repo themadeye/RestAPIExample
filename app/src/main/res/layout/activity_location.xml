@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#0b7376"
+    tools:context=".activities.LocationActivity">
+
+
+    <EditText
+        android:id="@+id/website_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edittext_uri"/>
+
+    <Button
+        android:id="@+id/open_website_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/button_uri"
+        android:onClick="openWebsite"
+        android:background="@drawable/shape"
+        android:textColor="#ffffff"
+        android:layout_margin="5dp"/>
+
+    <EditText
+        android:id="@+id/location_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edittext_uri"/>
+
+    <Button
+        android:id="@+id/open_location_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/button_loc"
+        android:onClick="openLocation"
+        android:background="@drawable/shape"
+        android:textColor="#ffffff"
+        android:layout_margin="5dp"/>
+
+    <EditText
+        android:id="@+id/share_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edittext_share"/>
+
+    <Button
+        android:id="@+id/share_text_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/button_share"
+        android:onClick="shareText"
+        android:background="@drawable/shape"
+        android:textColor="#ffffff"
+        android:layout_margin="5dp"/>
+
+</LinearLayout>
