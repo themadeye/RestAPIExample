@@ -24,7 +24,15 @@ nQIDAQAB</string>
     <string name="edittext_share">\'Twas brillig and the slithy toves</string>
     <string name="button_share">Share This Text</string>
     <string name="share_text_with">Share this text with: </string>
-
+    <string name="hello_world">Hello Fallas: </string>
+    <string name="change_color">Change Color</string>
+    <string name="intro_text">Droid Desserts</string>
+    <string name="donuts">Donuts are glazed and sprinkled with candy</string>
+    <string name="ice_cream_sandwiches">Ice cream sandwiches have chocolate wafers and vanilla filling.</string>
+    <string name="froyo">FroYo is premium self-serve frozen yogurt.</string>
+    <string name="donut_order_message">You ordered a donut.</string>
+    <string name="ice_cream_order_message">You ordered an ice cream sandwich.</string>
+    <string name="froyo_order_message">You ordered a FroYo.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
